@@ -1,0 +1,11 @@
+.ReadButton {
+    padding: 1vw 2vw; /* Padding inside the button */
+    font-size: 2em; /* Text size */
+    color: #fff; /* White text */
+    background-color: #6f0fec; /* Blue background */
+    border: none; /* No border */
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-top: 0%; /* Space below button */
+    align-self: center; /* Align button to the left */
+}

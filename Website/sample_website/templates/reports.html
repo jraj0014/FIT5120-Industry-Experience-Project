@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Platform</title>
+{% load static %}
+<!-- <link rel="stylesheet" href="{% static 'css/styles.css' %}"> -->
+<!-- <link rel="stylesheet" href="{% static 'css/index_background.css' %}"> -->
+<link rel="stylesheet" href="{% static 'theme/css/styles.css' %}">
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+</head>
+<style>
+    .content-flex {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .text-lead {
+      flex: 1; /* Allows the text to fill the space */
+      margin-right: 20px; /* Adjust the space between the text and the image */
+    }
+    
+    .rounded-image {
+      /* If you want a specific size for the image or rounded corners, apply here */
+      max-width: 75%; /* Ensures the image is responsive */
+      height: auto; /* Maintains the aspect ratio of the image */
+    }
+    
+    @media (max-width: 768px) {
+      .content-flex {
+        flex-direction: column; /* Stack them on smaller screens */
+      }
+      .text-lead {
+        margin-bottom: 20px; /* Space between text and image when stacked */
+      }
+    }
+
+   /* pointer */
+   .chevron-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 1vh;
+  cursor: pointer;
+}
+
+.chevron {
+  position: absolute;
+  width: 2.1rem; /* $base * 3.5 */
+  height: 0.48rem; /* $base * 0.8 */
+  opacity: 0;
+  transform: scale(0.3);
+  animation: move-chevron 3s ease-out infinite;
+}
+
+.chevron:first-child {
+  animation: move-chevron 3s ease-out 1s infinite;
+}
+
+.chevron:nth-child(2) {
+  animation: move-chevron 3s ease-out 2s infinite;
+}
+
+.chevron:before,
+.chevron:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: #2c3e50;
+}
+
+.chevron:before {
+  left: 0;
+  transform: skewY(30deg);
+}
+
+.chevron:after {
+  right: 0;
+  width: 50%;
+  transform: skewY(-30deg);
+}
+/* Hide all chevrons initially */
+.chevron-container {
+  display: none;
+}
+
+/* Show the chevron of the first section by default */
+section:first-of-type + .chevron-container {
+  display: flex;
+}
+
+/* Show the chevron of the next section if the current section is expanded */
+.expanded + .chevron-container {
+  display: flex;
+}
+
+
+@keyframes move-chevron {
+  25% {
+    opacity: 1;
+  }
+  33.3% {
+    opacity: 1;
+    transform: translateY(2.28rem); /* $base * 3.8 */
+  }
+  66.6% {
+    opacity: 1;
+    transform: translateY(3.12rem); /* $base * 5.2 */
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4.8rem) scale(0.5); /* $base * 8 */
+  }
+}
+
+
+section {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+  }
+
+  /* Style for the sections when expanded */
+  .expanded {
+    max-height: 100vh; /* Adjust as needed, or use 'auto' if you don't need a smooth transition */
+    overflow: auto;
+  }
+
+  </style>
+<body>
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+                <!-- Updated navbar brand to include an image -->
+      <a class="navbar-brand" href="{% url 'index' %}">
+        <img src="{% static 'images/logo.png' %}" alt="MellowTales Logo" style="height: 40px; width: auto; margin-right: 10px;">
+        MellowTales
+    </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'book_list' %}">Books</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'reports' %}">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </nav>
+
+    <section class="py-5 expanded">
+      <div class="container my-5">
+          <div class="row justify-content-center">
+              <div class="content-flex">
+                  <h1 class="lead fs-2 ">Education is a fundamental human right and a crucial pathway to opportunity for
+                      children around the world. As we navigate this data exploration, we&#39;ll uncover
+                      the evolving landscape of school enrollment and connectedness across several developed
+                      nations. For parents eager to play a proactive role in their child's educational journey, our website offers an invaluable tool for tracking your child's attention and engagement levels.</h1>
+              </div>
+          </div>
+      </div>
+    </section>
+      <div class="chevron-container">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+      </div>
+
+      <section class="py-5">
+        <div class="container my-5">
+          <div class="row">
+            <div class="content-flex">
+              <p class="lead">Our journey begins with a comprehensive comparison of 'Out of School' children’s populations among different developed nations of the world. We look into a comparison among four developed countries of the world with a similar population size – Australia, Canada, New Zealand and United Kingdom (UK).</p>
+              <img class="rounded-image " src="{% static 'images/graph1.jpg' %}" alt="graph1" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="chevron-container">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+      </div>
+
+      <section class="py-5 ">
+        <div class="container my-5">
+          <div class="row">
+            <div class="content-flex">
+            <img class="rounded-image" src="{% static 'images/graph2.jpg' %}" alt="graph2" />
+              <p class="lead">The data reveals a heartening downward trend along the years (2015-2018) – there has
+                been an increase in the number of out of school children, suggesting concerted efforts are
+                required to improve school enrollment and retention over this period in these developed
+                countries including Australia.Further explored via a pie chart unveils a more precise distribution of &#39;Out of School&#39;
+                children across these nations. Canada emerges with the largest portion at 47%, followed by
+                the United Kingdom at 33%. While Australia and New Zealand still account for 14.8% and
+                5.2% respectively. Taking into consideration Australia here, it does take up a significant
+                chunk of the portion here.</p>    
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="chevron-container">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+      </div>
+      <section class="py-5 ">
+        <div class="container my-5">
+          <div class="row">
+            <div class="content-flex">
+              <p class="lead">Further zooming in on Australia, we examine the number of &#39;Out of School&#39; children
+                from 2015 to 2018, broken down by gender. In leu to the overall trend, the data for
+                Australia paints a less optimistic picture, with the &#39;Out of School&#39; population steadily
+                increasing over this time. Understanding the unique challenges hindering progress in
+                Australia, even as neighboring nations demonstrate improvements, will be crucial for
+                developing targeted solutions.</p>
+              <img class="rounded-image " src="{% static 'images/graph3.jpg' %}" alt="graph3" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="chevron-container">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+      </div>
+      <section class="py-5 ">
+        <div class="container my-5">
+          <div class="row">
+            <div class="content-flex">
+            <img class="rounded-image" src="{% static 'images/graph4.jpg' %}" alt="graph4" />
+              <p class="lead">We shift our focus to Victoria, Australia, where we explore the percentage of retention rates
+                and connectedness to school of children in school from 2015 to 2023.We see there is a declining trend in the retention rates of school children along the
+                years in Victoria and there is a strong need for different tools and technologies to address
+                these challenges more in depth.</p>    
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="chevron-container">
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+        <div class="chevron"></div>
+      </div>
+      <section class="py-5 ">
+        <div class="container my-5">
+          <div class="row">
+            <div class="content-flex">
+              <p class="lead">We also see that the overall connectedness level of children with their school is only in the
+                ranges of 54% to 62% indicating a massive gap in the overall satisfaction of school
+                experience for children.
+                Through this interactive data exploration, we&#39;ve gained valuable insights into the evolving
+                landscape of education access and equity across several developed nations. While the
+                overall trends suggest progress, the persistent disparities underline the need for continued,
+                data-driven efforts to ensure all children have the opportunity to unlock their full potential
+                through quality education.</p>
+              <img class="rounded-image " src="{% static 'images/graph5.jpg' %}" alt="graph5" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="py-5 bg-primary">
+        <div class="container">
+          <p class="m-0 text-center text-white">Copyright &copy; MellowTales 2024</p>
+          <a class="text-center text-white" href="{% url 'index' %}">Home</a>
+          <a class="text-center text-white" href="{% url 'book_list' %}">Books</a>
+          <a class="text-center text-white" href="{% url 'reports' %}">Reports</a>
+          <a class="text-center text-white" href="{% url 'about' %}">About</a>
+        </div>
+    </footer>
+
+
+    <script>
+      // Wait for the DOM to fully load
+      document.addEventListener('DOMContentLoaded', function() {
+        // Select all chevron containers
+        const chevronContainers = document.querySelectorAll('.chevron-container');
+    
+        // Iterate over each chevron container
+        chevronContainers.forEach(function(container) {
+          // Add a click event listener to each container
+          container.addEventListener('click', function() {
+            // Select the next sibling element, which should be the section to expand
+            const nextSection = this.nextElementSibling;
+    
+            // Toggle the 'expanded' class on the next section
+            nextSection.classList.toggle('expanded');
+          });
+        });
+      });
+    </script>    
+</body>
+
