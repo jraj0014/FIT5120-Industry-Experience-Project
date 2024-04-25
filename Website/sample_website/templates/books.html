@@ -1840,9 +1840,9 @@
 	</div>
   </div>
   <!-- Search box -->
-<!-- <div class="search-container">
+<div class="search-container">
 	<input type="text" id="searchBox" placeholder="Search for a book..." />
-  </div> -->
+  </div>
   
   <!-- Books grid (unchanged) -->
   <div class="books-grid" id="booksGrid">
@@ -2246,6 +2246,7 @@ function validateAndRedirect() {
   var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (emailPattern.test(email)) {
     // If the email is valid, hide the modal and redirect
+	localStorage.setItem('userEmail', email);
     document.getElementById('emailModal').style.display = 'none';
     window.location.href = window.redirectUrl;
   } else {
@@ -2253,6 +2254,18 @@ function validateAndRedirect() {
     document.getElementById('emailError').style.display = 'block';
   }
 }
+
+
+// function validateAndRedirect() {
+//     var email = document.getElementById('userEmail').value;
+//     if (emailPattern.test(email)) { // Assuming you have an email validation pattern
+//         localStorage.setItem('userEmail', email); // Save the email in local storage
+//         window.location.href = window.redirectUrl; // Redirect to the URL
+//     } else {
+//         document.getElementById('emailError').style.display = 'block'; // Show error if validation fails
+//     }
+// }
+
 // Close modal when clicking outside of it
 window.onclick = function(event) {
   if (event.target == document.getElementById('emailModal')) {
@@ -2271,30 +2284,23 @@ document.querySelectorAll('.button-20').forEach(button => {
 
 // Filter books based on search term
 
-// document.addEventListener('DOMContentLoaded', () => {
-//   const searchBox = document.getElementById('searchBox');
-//   searchBox.addEventListener('keyup', filterBooks);
-// });
+document.addEventListener('DOMContentLoaded', () => {
+  const searchBox = document.getElementById('searchBox');
+  searchBox.addEventListener('keyup', filterBooks);
+});
 
-// function filterBooks() {
-//   const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-//   const books = document.querySelectorAll('.book-container');
+function filterBooks() {
+  const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+  const books = document.querySelectorAll('.book-container');
 
-//   books.forEach(book => {
-//     const title = book.querySelector('h2').textContent.toLowerCase();
-//     const description = book.querySelector('p').textContent.toLowerCase();
-//     if (title.includes(searchTerm) || description.includes(searchTerm)) {
-//       book.style.display = ''; // book matches search term, make sure it's visible
-//     } else {
-//       book.style.display = 'none'; // book does not match search term, hide it
-//     }
-//   });
-// }
-
-
-
-
-
-
-
+  books.forEach(book => {
+    const title = book.querySelector('h2').textContent.toLowerCase();
+    const description = book.querySelector('p').textContent.toLowerCase();
+    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+      book.style.display = ''; // book matches search term, make sure it's visible
+    } else {
+      book.style.display = 'none'; // book does not match search term, hide it
+    }
+  });
+}
 </script>

@@ -12,21 +12,53 @@
             flex-direction: column;
             height: 100vh;
             background-color: #f0f0f0;
+            align-items: center;
+            justify-content: center;
         }
 
-        iframe {
-            flex-grow: 1;
+        #canvas-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        canvas {
+            border: 1px solid black;
+            max-width: 100%;
+            max-height: 100vh;
+        }
+
+        .nav-button {
+            padding: 8px 16px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .nav-button:hover {
+            background-color: #0056b3;
+        }
+
+        .nav-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px; /* Adjust height based on canvas size */
         }
 
         #end-session-form {
+            margin-top: 10px;
             padding: 10px;
             background-color: #fff;
             text-align: center;
             border-top: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         #end-session-form button {
-            padding: 8px 16px;
             font-size: 16px;
             color: #fff;
             background-color: #007bff;
@@ -38,61 +70,201 @@
         #end-session-form button:hover {
             background-color: #0056b3;
         }
+    </style>    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f0f0f0;
+            align-items: center;
+            justify-content: center;
+        }
 
-        #camera-feed {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 160px;
-            height: 120px;
-            border: 3px solid #ddd;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        #canvas-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        canvas {
+            border: 1px solid black;
+            max-width: 80%;
+            max-height: 80vh;
+        }
+
+        .nav-button {
+            padding: 8px 16px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .nav-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 200px; /* Adjust height based on canvas size */
+        }
+
+        #end-session-form {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #end-session-form button {
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #end-session-form button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <iframe src="{{ pdf_url }}" width="100%" height="100%">
-        Your browser does not support iframes.
-    </iframe>
-
-    <!-- Form for ending the session -->
+    
+    <div id="canvas-container">
+        <button class="nav-button" id="prev-page">&#8592; Previous</button>
+        <canvas id="pdf-canvas"></canvas>
+        <button class="nav-button" id="next-page">Next &#8594;</button>
+    </div>
+    <p id="displayEmail"></p>
     <form id="end-session-form" action="{% url 'index' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="end_time" id="end-time-input">
-        <input type="hidden" name="user_email" value="{{ user_email }}">
-        <button type="submit" onclick="endSession()">End Session</button>
+        <input type="hidden" id="user-email-input" name="user_email">
+        <!-- <input type="hidden" name="user_email" value="{{ user_email }}"> -->
+        <button class="nav-button"type="submit" onclick="endSession()">End Session</button>  
     </form>
-    
-    <!-- <video id="camera-feed" autoplay></video>
-  
-    <script>
-        var sessionEnded = false;
 
-        function endSession() {
-            sessionEnded = true;
-            var currentTime = new Date().toISOString();
-            document.getElementById('end-time-input').value = currentTime;
-            document.getElementById('end-session-form').submit();
+    <!-- Include PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script>
+        
+        window.onload = function() {
+        var userEmail = localStorage.getItem('userEmail'); // Retrieve the email from local storage
+        if (userEmail) {
+            document.getElementById('user-email-input').value = userEmail; // Set it as the value of an input element
+        }
+        };
+        var url = '{{ pdf_url }}'; // The URL of your PDF file
+        var pdfDoc = null,
+            pageNum = 1,
+            canvas = document.getElementById('pdf-canvas'),
+            ctx = canvas.getContext('2d');
+
+        function renderPage(num) {
+            pdfDoc.getPage(num).then(function(page) {
+                var viewport = page.getViewport({ scale: 1.5 });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                page.render(renderContext);
+            });
         }
 
-        window.addEventListener('beforeunload', function (e) {
-            if (!sessionEnded) {
-                e.returnValue = 'Changes you made may not be saved.';
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (pageNum <= 1) {
+                return;
             }
+            pageNum--;
+            renderPage(pageNum);
         });
 
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    var video = document.getElementById('camera-feed');
-                    video.srcObject = stream;
-                })
-                .catch(function(err) {
-                    console.error("An error occurred: " + err);
-                });
-        } else {
-            alert('Sorry, your browser does not support user media.');
+        document.getElementById('next-page').addEventListener('click', function() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            renderPage(pageNum);
+        });
+
+        // The workerSrc property must be specified.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            renderPage(pageNum); // Render the first page immediately
+        });
+
+//         function endSession() {
+//     var userEmail = localStorage.getItem('userEmail'); // Get email from local storage
+//     var endTime = new Date().toISOString(); // Format your end time as needed
+
+//     // Prepare data to be sent in the POST request
+//     var formData = new FormData();
+//     formData.append('email', userEmail);
+//     formData.append('end_time', endTime);
+//     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}'); // Ensure CSRF token is sent with the request
+
+//     // Create an AJAX request to the server
+//     fetch("{% url 'send_email' %}", { // Make sure this matches the actual URL configured in Django urls.py
+//         method: 'POST',
+//         body: formData,
+//         headers: {
+//             'X-Requested-With': 'XMLHttpRequest' // Necessary for Django to recognize AJAX request
+//         }
+//     }).then(response => response.json())
+//     .then(data => {
+//         if (data.message) {
+//             alert(data.message); // Notify the user of success
+//         } else {
+//             throw new Error(data.error || "Failed to send email.");
+//         }
+//     }).catch(error => {
+//         console.error('Error sending email:', error); // Log error in console
+//         alert(error.message); // Notify the user of failure
+//     });
+// }
+function endSession() {
+    var userEmail = localStorage.getItem('userEmail');
+    var bookName = 'The Example Book2';  // This should be fetched according to the book read
+    var timeElapsed = '2 hours 1 minutes';  // This should be calculated based on the session length
+
+    var formData = new FormData();
+    formData.append('email', userEmail);
+    formData.append('book_name', bookName);
+    formData.append('time_elapsed', timeElapsed);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch("{% url 'send_email' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
         }
-    </script> -->
+    }).then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message); // Notify the user of success
+        } else {
+            throw new Error(data.error || "Failed to send email.");
+        }
+    }).catch(error => {
+        console.error('Error sending email:', error); // Log error in console
+        alert(error.message); // Notify the user of failure
+    });
+}
+
+        
+    </script>
 </body>
 </html>
