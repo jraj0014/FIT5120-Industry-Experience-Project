@@ -1,246 +1,113 @@
-library(maps)
-library(leaflet)
-library(dplyr)
+#Reports Graph - 1 - With Checkbox
+# Load required libraries
 library(shiny)
+library(ggplot2)
+library(plotly)
+library(dplyr)
 library(lubridate)
 library(httr)
-library(jsonlite)
 library(tidyverse)
 library(stringr)
-#library(plotly)
+library(reshape2)
+library(viridis)
+#library(hrbrthemes)
+#library(readxl)
+#library(htmlwidgets)
 
-getwd()
-
-df1 = read.csv("postcode.csv")
-df1 <- arrange(df1, suburb)
-
-
-#library(lubridate)
-df2 = read.csv("dvp_vis2_final.csv")
-df2$Year = year(df2$listingDate)
-
-df2 = df2[df2$Year < 2022,]
-
-df3 = read.csv("ans3_dvp 2.csv")
-df_cancer = read.csv("Cancerstats.csv")
-
-df3$workType = str_to_title(df3$workType, locale = "en")
-
-data3 = df3 %>%
-  group_by(workType,year) %>%
-  summarise(Count = n())
-
-data3_cancer = df_cancer %>%
-  group_by(Cancer.group.site,Year,State.or.Territory) #%>%
-  #summarise(Count = n())
-
-data3$year = as.factor(data3$year)
+#setwd("C:/Users/HP/Documents/Iteration 1 Datasets/Datasets/app1")
 
 
 
 
+
+#Read the 'out of schoool' statistics Global dataset.
+Out_of_school <- read.csv("3- number-of-out-of-school-children.csv")
+
+names(Out_of_school) <- c("Country", "Country_code","Year", "Count_of_Males","Count_of_Females")
+
+
+#Filter out the developed "5 Eyes" countries (excluding USA as it's an outlier) for comparison.
+Out_of_school_5Eyes <- Out_of_school %>% 
+  filter(Country == "Australia" |Country == "Canada"|Country == "New Zealand"|Country == "United Kingdom")
+
+#Filter out Years Greater than or equal to 2015 to consider most recent data.
+Out_of_school_5Eyes <- Out_of_school_5Eyes %>% 
+  filter(Year >= 2015)
+
+#As factor Year.
+Out_of_school_5Eyes$Year <- factor(Out_of_school_5Eyes$Year)
+
+#Create new column to get combined count of both the genders.
+Out_of_school_5Eyes$Count <- Out_of_school_5Eyes$Count_of_Males + Out_of_school_5Eyes$Count_of_Females
+#Out_of_school_5Eyes$Count <- prettyNum(Out_of_school_5Eyes$Count, big.mark = ",", scientific = FALSE)
+#Out_of_school_5Eyes$Count <- as.integer(Out_of_school_5Eyes$Count)
+#str(Out_of_school_5Eyes)
+
+# Define UI
 ui <- fluidPage(
+  titlePanel("Figure 1: Comparison of 'Out of School' children in the 5 Eyes Countries(Excluding USA)."),
   
-  column(width = 8,
-         
-         wellPanel(
-           h2("Select location using Suburb or Postcode:"),
-           fluidRow(
-             selectInput("SelectTypeP1",
-                         "Use the dropdown OR type in the suburb name or post code:",
-                         # unique(df1$suburb),
-                          choices = paste(df1$suburb, " - ", df1$postcode), 
-                          width = '100%',
-             )
-           ),
-           br(),
-           mainPanel(
-             column(width = 8,
-             # Display the text from the dataframe
-           #  UV_Index <- textOutput("Uniquelat"),
-           #  print(typeof(UV_Index)),
-             h2("The UV-index at this location is: " ),
-             #tags$style(HTML(".shiny-text-output pre {font-size: 128px;}")),
-             h1(textOutput("Uniquelat")))
-             #print(uniquelat)
-           ),
-           #h2("The UVindex is ", weather_data$lat),
-           fluidRow(
-             column(width = 8,
-             plotOutput("Plot1", height = "4px"),
-             #h2("The UVindex is: ", uniquelat)
-           ))
-         )
-         
-  ) , 
-  # column(width = 6,
-  #        
-  #        wellPanel(
-  #          h2("Graph 2: Title here"),
-  #          fluidRow(
-  #            sliderInput("SelectYearP2",
-  #                        "Select Year Range",
-  #                        min = min(df2$Year),
-  #                        max = max(df2$Year),
-  #                        value = c(min(df2$Year),max(df2$Year)),
-  #                        width = '100%',
-  #                        step = 1,
-  #                        sep = ""
-  #            )
-  #          ),
-  #          
-  #          fluidRow(
-  #            leafletOutput("Plot2")
-  #            
-  #          )
-  #        )
-  #        
-  # ), 
-  column(width = 12,
-         
-         wellPanel(
-           fluidRow(
-             h2("Skin cancer Statistics in Australia (2007-2019).")
-             
-            
-             )
-           ),
-           
-           
-           
-           fluidRow(
-             plotOutput("Plot3")
-             
-           )
-         )
-         
-  )
-  
+  # Add checkboxes
+  sidebarLayout(
+    sidebarPanel (
+      checkboxGroupInput("checkboxes", "Select year to display data:", 
+                         choices = c("Australia", "Canada", "New Zealand", "United Kingdom"),
+                         selected = c("Australia", "Canada", "New Zealand", "United Kingdom"),)),
+    
+  # Create a full-page Plotly graph
+  mainPanel(plotlyOutput("gg", height = "auto"),
+            uiOutput("bottom_text"))
+))
 
-
-
-
+# Define server logic
 server <- function(input, output, session) {
   
-  
-  output$Plot1 = renderPlot({
-    req(input$SelectTypeP1)
+  #Plot Stacked bar graph to compare 'out of school' children of different countries.
+  output$gg <- renderPlotly({ 
+    Out_of_school_5Eyes <- filter(Out_of_school_5Eyes,Country %in% as.character(input$checkboxes))
     
-    input_select <- str_split(input$SelectTypeP1, "-", simplify = TRUE)
-    input_suburb <- trimws(input_select[1], which = "right")
     
-    print(input_suburb)
-    #print(input$SelectTypeP1)
-    
-    data1 = df1 %>%
-      filter(suburb == input_suburb)
-    
-    view(data1)
-    print("data1")
-    
-    #data1$Cat = as.factor(data1$Cat)
-    
-    lati = data1$latitude
-    longi = data1$longitude
-    
-    print(lati)
-    
-    ## Make the API request
-    url <- "https://api.openweathermap.org/data/3.0/onecall?appid=2b617bc58375d868af255a1eac2053d1&units=metric"
-    response <- GET(url, 
-                    query = list(lat = lati, lon = longi))
-    
-                    # Check if the request was successful
-                    if (http_status(response)$category == "Success") {
-                      # Parse JSON response
-                      weather_data <- content(response, "text") %>%
-                        fromJSON()
-                      
-                      # Extract relevant information
-                      temperature <- weather_data$current$temp 
-                      uvindex <- weather_data$current$uvi 
-                      wind_speed <- weather_data$current$wind_speed 
-                      # Print the weather details
-                      
-                      #h2("The UVindex is: ", weather_data$current$wind_speed)
-                      output1 <- weather_data$lat
-  
-                      cat("Current Temperature of the location:", temperature, "°C\n")
-                      cat("Current UV index", uvindex, "\n")
-                      cat("Windspeed", wind_speed, "\n")
-                      print(uvindex)
-                      # Output the text from the dataframe
-                      output$Uniquelat <- renderText({
-                        # Convert list to string using paste()
-                        uvindex_str <- paste(uvindex, collapse = ", ")
-                        return(uvindex_str)})
-                        #capture.output(weather_data$current$uvi)})
-                        #capture.output(uvindex)})
-                    } else {
-                      cat("Error:", http_status(response)$reason, "\n")
-                    }
-    
+    ggplot(Out_of_school_5Eyes, aes(y=Count, x=Country, fill=Year)) + 
+    geom_bar(position="stack", stat="identity",
+             #aes(
+     # text = paste0(
+      #  "<b>", Country, "</b>", "<br>",
+      #  "Year: ", Year, "<br>",
+     #   "Count: ", scales::comma(Count, 1), "<br>"))
+    ) +
+    scale_fill_viridis(discrete = T) +
+    #geom_label(label= Out_of_school_5Eyes$Count_Both_Genders,nudge_x = 0.25, nudge_y = 0.25, 
+    #           check_overlap = T, size = 2.8)+
+    #ggtitle("Comparison of 'Out of school' children of developed countries from year 2015-2018.") +
+    theme(plot.title = element_text(size = 18)) +
+    labs(fill = "Year:") +
+    xlab("Country") + ylab("Count") +
+    guides(color = guide_legend(title = "Select Year")) +
+    scale_y_continuous(labels = function(x) format(x, scientific = FALSE))+
+    theme_bw() 
     
     
   })
   
+#output$gg$x$layout$hovermode <- FALSE
   
-  output$Plot2 = renderLeaflet({
-    
-    req(input$SelectYearP2)
-    
-    leaflet(data = df2[df2$Year >= input$SelectYearP2[1]
-                       & df2$Year <= input$SelectYearP2[2]
-                       ,]) %>% addTiles() %>%
-      addMarkers(
-        ~Longitude, 
-        ~Latitude, 
-        popup = ~as.character(state),
-        clusterOptions = markerClusterOptions()
+  
+  
+   output$plot <- renderPlotly({
+    ggplotly(output$gg,
+      #tooltip = c("text")
+      ) %>%
+      layout(
+        legend = list(title = list(text = "Select Year:")),
+        autosize = TRUE,
+        margin = list(l = 50, r = 50, t = 50, b = 50)
       )
-    
   })
   
-  
-  output$Plot3 = renderPlot({
-   # req(input$SelectTypeP3)
-  #  req(input$SelectYearP3)
-    
-    
-  
-    #  data3 = data3 %>%
-    #  filter(workType %in% input$SelectTypeP3) %>%
-    #  filter(year %in% input$SelectYearP3) 
-    
-    df_cancer = read.csv("Cancerstats.csv")
-    
-    data3_cancer = df_cancer %>%
-      group_by(Cancer.group.site,Year,State.or.Territory)
-    
-    df_cancer$Count <- as.numeric(df_cancer$Count)
-    
-    
-    stats <- df_cancer %>%
-      group_by(Year,Cancer.group.site) %>%
-      summarise(perYearcount = sum(Count, na.rm = TRUE))
-    
-    stats$'Cancer_Type' <- stats$Cancer.group.site
-   # stats$Year <- as.numeric(stats$Year)
-    
-    ggplot(data=stats, (aes(x=Year, y=perYearcount, color=Cancer_Type))) +
-      geom_line() +
-      labs( x = "Year", y = "Number of Incidents Reported") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
-      scale_x_continuous(breaks = stats$Year)
-      #theme_minimal()
-    
-    
-    
-  })
-  
+   output$bottom_text <- renderUI({
+     HTML("<br><div style='text-align: center;'>Source: Worldbank data - https://github.com/worldbank/GLAD</div>")})
+#  output$plot$x$layout$hovermode <- FALSE
 }
 
-
-
-
-shinyApp(ui, server)
+# Run the application
+shinyApp(ui = ui, server = server)
