@@ -1,0 +1,126 @@
+/* styles.css */
+
+/* General reset and basic styles */
+body, h1, h2, p, button {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Header and navigation styles */
+  header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* Hero section styles */
+  main .hero {
+    background-color: #f8f8f8;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  main .hero h1 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  main .hero p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  main .hero button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+  }
+  
+  main .hero button:hover {
+    background-color: #0056b3;
+  }
+  
+  main .hero a {
+    color: #007bff;
+    display: inline-block;
+    margin-top: 1rem;
+  }
+  
+  /* Features section styles */
+  #features {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #fff;
+  }
+  
+  .feature {
+    margin: 0 1rem;
+    text-align: center;
+  }
+  
+  .feature img {
+    width: 80px; /* Adjust based on actual image size */
+    margin-bottom: 1rem;
+  }
+  
+  /* Updates section styles */
+  .updates {
+    background-color: #ffddcc; /* Adjust color based on the design */
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .updates h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .updates p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  .updates button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+  }
+  
+  .updates button:hover {
+    background-color: #218838;
+  }
+  
+  .read-pdf-button {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .read-pdf-button:hover {
+    background-color: #0056b3;
+  }
+  

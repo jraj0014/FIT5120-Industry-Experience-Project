@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Platform</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<style>
+    body, h1, h2, p, a, button {
+        font-family: 'Arial', sans-serif;
+    }
+    header {
+        background-color: #f8f9fa;
+        padding: 10px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+    nav a {
+        text-decoration: none;
+        color: #007bff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+    nav a:hover {
+        background-color: #e7f1ff;
+    }
+    .hero {
+        text-align: center;
+        padding: 40px 20px;
+        background: #e7f1ff;
+    }
+    .hero h1 {
+        margin-bottom: 20px;
+        font-size: 2.5em;
+    }
+    .hero p {
+        margin-bottom: 20px;
+        color: #333;
+        line-height: 1.6;
+    }
+    .hero button {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .hero button:hover {
+        background-color: #218838;
+    }
+    .hero a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .hero img {
+        margin-top: 20px;
+        max-width: 100px; /* Adjust based on your image */
+    }
+    #features {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px 0;
+    }
+    .feature {
+        text-align: center;
+    }
+    .feature img {
+        max-width: 80px; /* Adjust based on your image */
+        margin-bottom: 10px;
+    }
+    .updates {
+        background: #fff3cd;
+        padding: 20px;
+        text-align: center;
+    }
+    .updates h2 {
+        color: #856404;
+    }
+    .read-pdf-button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-top: 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+    .read-pdf-button:hover {
+        background-color: #0056b3;
+    }
+    .messages {
+        padding: 10px 20px;
+        list-style: none;
+    }
+    .messages li {
+        background: #d4edda;
+        color: #155724;
+        margin-bottom: 5px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
+
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="{% url 'index' %}">Logo</a>
+    <a href="{% url 'book_list' %}">Books</a>
+    <a href="{% url 'about' %}">About</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Unlock your child's potential with tailored engagement insights and fun learning experiences.</h1>
+    <p>Our platform empowers parents with real-time progress reports and turns education into an adventure, making every click a step towards a brighter future.</p>
+    <button>Sign Up</button>
+    <a href="{% url 'about' %}">Why You Should Care!</a>
+    <img src="{% static 'images/child-icon.jpg' %}" alt="ChildImage">
+  </section>
+  
+  <section id="features">
+
+    
+    <div class="feature">
+      <img src="{% static 'images/book-icon.png' %}" alt="Choose a book">
+      <p>Select from a wide range of books</p>
+    </div>
+    <div class="feature">
+      <img src="{% static 'images/report-icon.png' %}" alt="Get the report">
+      <p>Post reading session, get mail with attention score</p>
+    </div>
+  </section>
+  
+  <section class="updates">
+    <h2>Exciting Updates Just In! Discover what's new</h2>
+    <p>Stay ahead with the latest enhancements designed to make your experience even better. Click here to find out more!</p>
+    <a href="{% url 'read_pdf_view' %}" class="read-pdf-button" target="_blank">Read PDF</a>
+  </section>
+</main>
+
+</body>
+</html>

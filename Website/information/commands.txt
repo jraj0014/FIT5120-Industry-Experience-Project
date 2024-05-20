@@ -1,0 +1,14 @@
+# Check django version
+django-admin --version
+
+# Run server
+py manage.py runserver
+
+# Chage in setting
+PROJECT_DIR = os.path.join(BASE_DIR, "sample_website")
+
+
+nohup python manage.py runserver 0.0.0.0:8000 &
+
+
+sudo /opt/bitnami/ctlscript.sh restart apache
